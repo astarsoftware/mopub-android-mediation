@@ -5,6 +5,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import com.astarsoftware.android.ads.AdNetworkTracker;
+import com.astarsoftware.dependencies.DependencyInjector;
+
 import com.facebook.ads.Ad;
 import com.facebook.ads.AdError;
 import com.facebook.ads.AdListener;
@@ -128,6 +131,9 @@ public class FacebookBanner extends CustomEventBanner implements AdListener {
             MoPubLog.log(SHOW_ATTEMPTED, ADAPTER_NAME);
             MoPubLog.log(SHOW_SUCCESS, ADAPTER_NAME);
         }
+
+        AdNetworkTracker adTracker = DependencyInjector.getObjectWithClass(AdNetworkTracker.class);
+		adTracker.adDidLoadForNetwork("facebook", null);
     }
 
     @Override

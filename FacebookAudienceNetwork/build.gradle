@@ -4,5 +4,9 @@ project.ext.networkName = 'facebook'
 apply from: '../shared-build.gradle'
 
 dependencies {
+
+	implementation project(':Libraries:Java:Android:libAndroid')
+	implementation project(':ThirdParty:Java:Android:MoPub:mopub-sdk:')
     implementation "com.facebook.android:audience-network-sdk:${sdkVersion}"
 }
+

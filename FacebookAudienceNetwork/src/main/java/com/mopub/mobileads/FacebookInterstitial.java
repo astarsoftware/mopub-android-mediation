@@ -5,6 +5,8 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
+import com.astarsoftware.android.ads.AdNetworkTracker;
+import com.astarsoftware.dependencies.DependencyInjector;
 import com.facebook.ads.Ad;
 import com.facebook.ads.AdError;
 import com.facebook.ads.AudienceNetworkAds;
@@ -140,6 +142,9 @@ public class FacebookInterstitial extends CustomEventInterstitial implements Int
             MoPubLog.log(LOAD_SUCCESS, ADAPTER_NAME);
         }
         mHandler.postDelayed(mAdExpiration, ONE_HOURS_MILLIS);
+
+		AdNetworkTracker adTracker = DependencyInjector.getObjectWithClass(AdNetworkTracker.class);
+		adTracker.adDidLoadForNetwork("facebook", null);
     }
 
     @Override
