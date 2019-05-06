@@ -5,6 +5,8 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
+import com.astarsoftware.dependencies.DependencyInjector;
+import com.astarsoftware.notification.NotificationCenter;
 import com.mopub.common.MoPub;
 import com.mopub.common.Preconditions;
 import com.mopub.common.logging.MoPubLog;
@@ -18,6 +20,7 @@ import com.verizon.ads.edition.StandardEdition;
 import com.verizon.ads.interstitialplacement.InterstitialAd;
 import com.verizon.ads.interstitialplacement.InterstitialAdFactory;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static com.mopub.common.logging.MoPubLog.AdapterLogEvent.CLICKED;
@@ -43,13 +46,20 @@ public class VerizonInterstitial extends CustomEventInterstitial {
     private Context context;
     private CustomEventInterstitialListener interstitialListener;
     private InterstitialAd verizonInterstitialAd;
+	private NotificationCenter notificationCenter;
 
-    @NonNull
+
+	@NonNull
     private VerizonAdapterConfiguration verizonAdapterConfiguration;
 
     public VerizonInterstitial() {
         verizonAdapterConfiguration = new VerizonAdapterConfiguration();
-    }
+		DependencyInjector.requestInjection(this, "NotificationCenter", "notificationCenter");
+	}
+
+	public void setNotificationCenter(NotificationCenter notificationCenter) {
+		this.notificationCenter = notificationCenter;
+	}
 
     @Override
     protected void loadInterstitial(final Context context,
@@ -245,6 +255,16 @@ public class VerizonInterstitial extends CustomEventInterstitial {
                 @Override
                 public void run() {
                     if (listener != null) {
+						Map<String, Object> networkInfo = new HashMap<>();
+						if(creativeInfo != null && creativeInfo.getCreativeId() != null) {
+							networkInfo.put("vzCreativeId", creativeInfo.getCreativeId());
+						}
+						if(creativeInfo != null && creativeInfo.getDemandSource() != null) {
+							networkInfo.put("vzDemandSource", creativeInfo.getDemandSource());
+						}
+						networkInfo.put("vzCreativeType", "Interstitial");
+
+						notificationCenter.postNotification("AdDidLoadForVerizon", networkInfo);
                         listener.onInterstitialLoaded();
                     }
                 }

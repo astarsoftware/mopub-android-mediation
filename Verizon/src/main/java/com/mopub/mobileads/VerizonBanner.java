@@ -8,6 +8,8 @@ import android.view.Gravity;
 import android.widget.FrameLayout;
 import android.widget.FrameLayout.LayoutParams;
 
+import com.astarsoftware.dependencies.DependencyInjector;
+import com.astarsoftware.notification.NotificationCenter;
 import com.mopub.common.MoPub;
 import com.mopub.common.Preconditions;
 import com.mopub.common.logging.MoPubLog;
@@ -23,6 +25,7 @@ import com.verizon.ads.inlineplacement.InlineAdFactory;
 import com.verizon.ads.inlineplacement.InlineAdView;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -48,15 +51,22 @@ public class VerizonBanner extends CustomEventBanner {
     private InlineAdView verizonInlineAd;
     private CustomEventBannerListener bannerListener;
     private FrameLayout internalView;
+	private NotificationCenter notificationCenter;
 
-    private int adWidth, adHeight;
+
+	private int adWidth, adHeight;
 
     @NonNull
     private VerizonAdapterConfiguration verizonAdapterConfiguration;
 
     public VerizonBanner() {
-        verizonAdapterConfiguration = new VerizonAdapterConfiguration();
+    	verizonAdapterConfiguration = new VerizonAdapterConfiguration();
+		DependencyInjector.requestInjection(this, "NotificationCenter", "notificationCenter");
     }
+
+	public void setNotificationCenter(NotificationCenter notificationCenter) {
+		this.notificationCenter = notificationCenter;
+	}
 
     @Override
     protected void loadBanner(final Context context,
@@ -283,8 +293,21 @@ public class VerizonBanner extends CustomEventBanner {
                     }
 
                     if (listener != null) {
-                        listener.onBannerLoaded(internalView);
+						Map<String, Object> networkInfo = new HashMap<>();
+						if(creativeInfo != null && creativeInfo.getCreativeId() != null) {
+							networkInfo.put("vzCreativeId", creativeInfo.getCreativeId());
+						}
+						if(creativeInfo != null && creativeInfo.getDemandSource() != null) {
+							networkInfo.put("vzDemandSource", creativeInfo.getDemandSource());
+						}
+						networkInfo.put("vzCreativeType", "Banner");
+
+						notificationCenter.postNotification("AdDidLoadForVerizon", networkInfo);
+
+						listener.onBannerLoaded(internalView);
                     }
+
+
                 }
             });
         }
