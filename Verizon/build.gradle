@@ -1,4 +1,4 @@
-project.version = '1.0.2.1'
+project.version = '1.0.2.2'
 project.ext.networkName = 'Verizon'
 
 apply from: '../shared-build.gradle'
