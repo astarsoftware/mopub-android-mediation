@@ -4,5 +4,7 @@ project.ext.networkName = 'admob_native'
 apply from: '../shared-build.gradle'
 
 dependencies {
+	implementation project(':Libraries:Java:Android:libAndroid')
+	implementation project(':ThirdParty:Java:Android:MoPub:mopub-sdk:')
     implementation "com.google.android.gms:play-services-ads:${sdkVersion}"
 }

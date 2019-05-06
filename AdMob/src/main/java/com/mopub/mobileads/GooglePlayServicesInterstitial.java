@@ -5,6 +5,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
+import com.astarsoftware.android.ads.AdNetworkTracker;
+import com.astarsoftware.dependencies.DependencyInjector;
+
 import com.google.ads.mediation.admob.AdMobAdapter;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
@@ -208,6 +211,9 @@ public class GooglePlayServicesInterstitial extends CustomEventInterstitial {
             if (mInterstitialListener != null) {
                 mInterstitialListener.onInterstitialLoaded();
             }
+
+			AdNetworkTracker adTracker = DependencyInjector.getObjectWithClass(AdNetworkTracker.class);
+			adTracker.adDidLoadForNetwork("admob", null);
         }
 
         @Override
