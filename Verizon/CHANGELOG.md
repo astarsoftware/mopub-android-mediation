@@ -1,4 +1,8 @@
 ## Changelog
+  * 1.1.1.0
+    * This version of the adapters has been certified with Verizon 1.1.1.
+    * Add support to initialize the Verizon SDK in conjunction with MoPub's initialization.
+  
   * 1.0.2.2
     * Remove `maxSdkVersion` from a permission included in the AndroidManifest to avoid merge conflicts.
 
