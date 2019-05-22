@@ -240,15 +240,16 @@ public class VerizonInterstitial extends CustomEventInterstitial {
             verizonInterstitialAd = interstitialAd;
 
             MoPubLog.log(LOAD_SUCCESS, ADAPTER_NAME);
-
-            final CreativeInfo creativeInfo = verizonInterstitialAd == null ? null : verizonInterstitialAd.getCreativeInfo();
-            MoPubLog.log(CUSTOM, ADAPTER_NAME, "Verizon creative info: " + creativeInfo);
-
+            
             VerizonUtils.postOnUiThread(new Runnable() {
 
                 @Override
                 public void run() {
                     if (listener != null) {
+
+						final CreativeInfo creativeInfo = verizonInterstitialAd == null ? null : verizonInterstitialAd.getCreativeInfo();
+						MoPubLog.log(CUSTOM, ADAPTER_NAME, "Verizon creative info: " + creativeInfo);
+
 						Map<String, Object> networkInfo = new HashMap<>();
 						if(creativeInfo != null && creativeInfo.getCreativeId() != null) {
 							networkInfo.put("vzCreativeId", creativeInfo.getCreativeId());
