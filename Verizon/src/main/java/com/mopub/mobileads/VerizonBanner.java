@@ -274,10 +274,9 @@ public class VerizonBanner extends CustomEventBanner {
         public void onLoaded(final InlineAdFactory inlineAdFactory, final InlineAdView inlineAdView) {
             MoPubLog.log(LOAD_SUCCESS, ADAPTER_NAME);
 
-            final CreativeInfo creativeInfo = verizonInlineAd == null ? null : verizonInlineAd.getCreativeInfo();
-            MoPubLog.log(CUSTOM, ADAPTER_NAME, "Verizon creative info: " + creativeInfo);
+			verizonInlineAd = inlineAdView;
 
-            VerizonUtils.postOnUiThread(new Runnable() {
+			VerizonUtils.postOnUiThread(new Runnable() {
 
                 @Override
                 public void run() {
@@ -286,6 +285,10 @@ public class VerizonBanner extends CustomEventBanner {
                     }
 
                     if (listener != null) {
+
+						final CreativeInfo creativeInfo = verizonInlineAd == null ? null : verizonInlineAd.getCreativeInfo();
+						MoPubLog.log(CUSTOM, ADAPTER_NAME, "Verizon creative info: " + creativeInfo);
+
 						Map<String, Object> networkInfo = new HashMap<>();
 						if(creativeInfo != null && creativeInfo.getCreativeId() != null) {
 							networkInfo.put("vzCreativeId", creativeInfo.getCreativeId());
