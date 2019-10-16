@@ -3,7 +3,6 @@ package com.mopub.mobileads;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
-import androidx.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.widget.FrameLayout;
@@ -30,6 +29,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import androidx.annotation.NonNull;
 
 import static com.mopub.common.logging.MoPubLog.AdapterLogEvent.CLICKED;
 import static com.mopub.common.logging.MoPubLog.AdapterLogEvent.CUSTOM;
@@ -309,11 +310,7 @@ public class VerizonBanner extends CustomEventBanner {
                     }
 
                     if (listener != null) {
-
-						final CreativeInfo creativeInfo = verizonInlineAd == null ? null : verizonInlineAd.getCreativeInfo();
-						MoPubLog.log(CUSTOM, ADAPTER_NAME, "Verizon creative info: " + creativeInfo);
-
-						Map<String, Object> networkInfo = new HashMap<>();
+                    	Map<String, Object> networkInfo = new HashMap<>();
 						if(creativeInfo != null && creativeInfo.getCreativeId() != null) {
 							networkInfo.put("vzCreativeId", creativeInfo.getCreativeId());
 						}
