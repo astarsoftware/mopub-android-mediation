@@ -4,8 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
+
+import androidx.annotation.NonNull;
 
 import com.applovin.adview.AppLovinAdView;
 import com.applovin.adview.AppLovinAdViewDisplayErrorCode;
@@ -37,19 +38,11 @@ import static com.mopub.common.logging.MoPubLog.AdapterLogEvent.SHOW_SUCCESS;
 
 public class AppLovinBanner extends CustomEventBanner {
 
-    private static final Handler UI_HANDLER = new Handler(Looper.getMainLooper());
-
-    private static final int BANNER_STANDARD_HEIGHT = 50;
-    private static final int BANNER_HEIGHT_OFFSET_TOLERANCE = 10;
-    private static final int LEADER_STANDARD_HEIGHT = 90;
-    private static final int LEADER_HEIGHT_OFFSET_TOLERANCE = 16;
-
+    private static final String ADAPTER_NAME = AppLovinBanner.class.getSimpleName();
     private static final String AD_WIDTH_KEY = "com_mopub_ad_width";
     private static final String AD_HEIGHT_KEY = "com_mopub_ad_height";
-
+    private static final Handler UI_HANDLER = new Handler(Looper.getMainLooper());
     private static final String ZONE_ID_SERVER_EXTRAS_KEY = "zone_id";
-
-    private static final String ADAPTER_NAME = AppLovinBanner.class.getSimpleName();
 
     @NonNull
     private AppLovinAdapterConfiguration mAppLovinAdapterConfiguration;
@@ -91,7 +84,7 @@ public class AppLovinBanner extends CustomEventBanner {
             MoPubLog.log(CUSTOM, ADAPTER_NAME, "Requesting AppLovin banner with serverExtras: " +
                     serverExtras + ", localExtras: " + localExtras + " and has ad markup: " + hasAdMarkup);
 
-            AppLovinSdk sdk = retrieveSdk(serverExtras, context);
+            AppLovinSdk sdk = retrieveSdk(context);
             sdk.setMediationProvider(AppLovinMediationProvider.MOPUB);
             sdk.setPluginVersion(AppLovinAdapterConfiguration.APPLOVIN_PLUGIN_VERSION);
 
@@ -242,28 +235,20 @@ public class AppLovinBanner extends CustomEventBanner {
             return null;
         }
 
+        // Default to standard banner size
+        AppLovinAdSize adSize = AppLovinAdSize.BANNER;
+
         try {
             final int width = (Integer) localExtras.get(AD_WIDTH_KEY);
             final int height = (Integer) localExtras.get(AD_HEIGHT_KEY);
 
-            // We have valid dimensions
             if (width > 0 && height > 0) {
-                MoPubLog.log(CUSTOM, ADAPTER_NAME, "Valid width (" + width + ") and height " +
-                        "(" + height + ") provided");
-
-                // Assume fluid width, and check for height with offset tolerance
-                final int bannerOffset = Math.abs(BANNER_STANDARD_HEIGHT - height);
-                final int leaderOffset = Math.abs(LEADER_STANDARD_HEIGHT - height);
-
-                if (bannerOffset <= BANNER_HEIGHT_OFFSET_TOLERANCE) {
-                    return AppLovinAdSize.BANNER;
-                } else if (leaderOffset <= LEADER_HEIGHT_OFFSET_TOLERANCE) {
-                    return AppLovinAdSize.LEADER;
-                } else if (height <= AppLovinAdSize.MREC.getHeight()) {
-                    return AppLovinAdSize.MREC;
-                } else {
-                    MoPubLog.log(CUSTOM, ADAPTER_NAME, "Provided dimensions does not meet the dimensions " +
-                            "required of banner or mrec ads");
+                // Size can contain an AppLovin leaderboard ad size of 728x90
+                if (width >= 728 && height >= 90) {
+                    adSize = AppLovinAdSize.LEADER;
+                } else if (width >= 300 && height >= 250) {
+                    // Size can contain an AppLovin medium rectangle
+                    adSize = AppLovinAdSize.MREC;
                 }
             } else {
                 MoPubLog.log(CUSTOM, ADAPTER_NAME, "Invalid width (" + width + ") and height " +
@@ -274,7 +259,7 @@ public class AppLovinBanner extends CustomEventBanner {
                     "height from serverExtras", th);
         }
 
-        return null;
+        return adSize;
     }
 
     //
@@ -298,8 +283,8 @@ public class AppLovinBanner extends CustomEventBanner {
     /**
      * Retrieves the appropriate instance of AppLovin's SDK from the SDK key given in the server parameters, or Android Manifest.
      */
-    private static AppLovinSdk retrieveSdk(final Map<String, String> serverExtras, final Context context) {
-        final String sdkKey = serverExtras != null ? serverExtras.get("sdk_key") : null;
+    private static AppLovinSdk retrieveSdk(final Context context) {
+        final String sdkKey = AppLovinAdapterConfiguration.getSdkKey();
         final AppLovinSdk sdk;
 
         if (!TextUtils.isEmpty(sdkKey)) {

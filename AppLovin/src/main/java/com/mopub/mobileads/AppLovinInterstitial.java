@@ -4,8 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
+
+import androidx.annotation.NonNull;
 
 import com.applovin.adview.AppLovinInterstitialAd;
 import com.applovin.adview.AppLovinInterstitialAdDialog;
@@ -98,7 +99,7 @@ public class AppLovinInterstitial extends CustomEventInterstitial implements App
         this.listener = listener;
         this.context = context;
 
-        sdk = retrieveSdk(serverExtras, context);
+        sdk = retrieveSdk(context);
         sdk.setMediationProvider(AppLovinMediationProvider.MOPUB);
         sdk.setPluginVersion(AppLovinAdapterConfiguration.APPLOVIN_PLUGIN_VERSION);
 
@@ -319,8 +320,8 @@ public class AppLovinInterstitial extends CustomEventInterstitial implements App
     /**
      * Retrieves the appropriate instance of AppLovin's SDK from the SDK key given in the server parameters, or Android Manifest.
      */
-    private static AppLovinSdk retrieveSdk(final Map<String, String> serverExtras, final Context context) {
-        final String sdkKey = serverExtras != null ? serverExtras.get("sdk_key") : null;
+    private static AppLovinSdk retrieveSdk(final Context context) {
+        final String sdkKey = AppLovinAdapterConfiguration.getSdkKey();
         final AppLovinSdk sdk;
 
         if (!TextUtils.isEmpty(sdkKey)) {

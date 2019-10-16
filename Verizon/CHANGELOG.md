@@ -1,4 +1,20 @@
 ## Changelog
+  * 1.2.0.1
+    * Log the Verizon SDK edition name (if available) together with the network SDK version.
+  
+  * 1.2.0.0
+    * This version of the adapters has been certified with Verizon 1.2.0.
+
+  * 1.1.4.1
+    * Add support for AndroidX. This is the minimum version compatible with MoPub 5.9.0.
+
+  * 1.1.4.0
+    * Add support for rewarded video and native ad.
+    * This version of the adapters has been certified with Verizon 1.1.4.
+
+  * 1.1.3.0
+    * This version of the adapters has been certified with Verizon 1.1.3.
+
   * 1.1.1.1
     * Add support for parsing banner's width and height from `serverExtras`. This provides backwards compatibility for legacy Millennial adapters.
 

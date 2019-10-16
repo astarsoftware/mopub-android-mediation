@@ -3,7 +3,8 @@ package com.mopub.mobileads;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
+import androidx.annotation.Keep;
+import androidx.annotation.NonNull;
 
 import com.mopub.common.logging.MoPubLog;
 import com.vungle.warren.AdConfig;
@@ -22,6 +23,7 @@ import static com.mopub.common.logging.MoPubLog.AdapterLogEvent.SHOW_SUCCESS;
 /**
  * A custom event for showing Vungle Interstitial.
  */
+@Keep
 public class VungleInterstitial extends CustomEventInterstitial {
 
     /*
@@ -36,9 +38,10 @@ public class VungleInterstitial extends CustomEventInterstitial {
      * These keys can be used with MoPubInterstitial.setLocalExtras()
      * to pass additional parameters to the SDK.
      */
-    private static final String SOUND_ENABLED_KEY = "vungleSoundEnabled";
-    private static final String FLEX_VIEW_CLOSE_TIME_KEY = "vungleFlexViewCloseTimeInSec";
-    private static final String ORDINAL_VIEW_COUNT_KEY = "vungleOrdinalViewCount";
+    public static final String SOUND_ENABLED_KEY = "vungleSoundEnabled";
+    public static final String FLEX_VIEW_CLOSE_TIME_KEY = "vungleFlexViewCloseTimeInSec";
+    public static final String ORDINAL_VIEW_COUNT_KEY = "vungleOrdinalViewCount";
+    public static final String AUTO_ROTATE_ENABLED = "vungleAutoRotateEnabled";
 
     private static VungleRouter sVungleRouter;
     private final Handler mHandler;
@@ -65,6 +68,8 @@ public class VungleInterstitial extends CustomEventInterstitial {
                                     Map<String, String> serverExtras) {
         mCustomEventInterstitialListener = customEventInterstitialListener;
         mIsPlaying = false;
+
+        setAutomaticImpressionAndClickTracking(false);
 
         if (context == null) {
             mHandler.post(new Runnable() {
@@ -117,6 +122,9 @@ public class VungleInterstitial extends CustomEventInterstitial {
             Object ordinalViewCount = localExtras.get(ORDINAL_VIEW_COUNT_KEY);
             if (ordinalViewCount instanceof Integer)
                 mAdConfig.setOrdinal((Integer) ordinalViewCount);
+            Object autoRotateEnabled = localExtras.get(AUTO_ROTATE_ENABLED);
+            if (autoRotateEnabled instanceof Boolean)
+                mAdConfig.setAutoRotate((Boolean) autoRotateEnabled);
         }
 
         sVungleRouter.loadAdForPlacement(mPlacementId, mVungleRouterListener);
@@ -134,11 +142,17 @@ public class VungleInterstitial extends CustomEventInterstitial {
         } else {
             MoPubLog.log(CUSTOM, ADAPTER_NAME, "SDK tried to show a Vungle interstitial ad before it " +
                     "finished loading. Please try again.");
-            mCustomEventInterstitialListener.onInterstitialFailed(MoPubErrorCode.NETWORK_NO_FILL);
+            mHandler.post(new Runnable() {
 
-            MoPubLog.log(SHOW_FAILED, ADAPTER_NAME,
-                    MoPubErrorCode.NETWORK_NO_FILL.getIntCode(),
-                    MoPubErrorCode.NETWORK_NO_FILL);
+                @Override
+                public void run() {
+                    mCustomEventInterstitialListener.onInterstitialFailed(MoPubErrorCode.NETWORK_NO_FILL);
+
+                    MoPubLog.log(SHOW_FAILED, ADAPTER_NAME,
+                            MoPubErrorCode.NETWORK_NO_FILL.getIntCode(),
+                            MoPubErrorCode.NETWORK_NO_FILL);
+                }
+            });
         }
     }
 
@@ -225,6 +239,7 @@ public class VungleInterstitial extends CustomEventInterstitial {
                     @Override
                     public void run() {
                         mCustomEventInterstitialListener.onInterstitialShown();
+                        mCustomEventInterstitialListener.onInterstitialImpression();
 
                         MoPubLog.log(SHOW_SUCCESS, ADAPTER_NAME);
                     }

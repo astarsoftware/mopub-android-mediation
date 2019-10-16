@@ -2,8 +2,10 @@ package com.mopub.mobileads;
 
 import android.app.Application;
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import android.text.TextUtils;
 
 import com.mopub.common.BaseAdapterConfiguration;
@@ -23,9 +25,9 @@ public class VerizonAdapterConfiguration extends BaseAdapterConfiguration {
 
     private static final String ADAPTER_VERSION = BuildConfig.VERSION_NAME;
     private static final String MOPUB_NETWORK_NAME = BuildConfig.NETWORK_NAME;
-    private static final String VAS_SITE_ID_KEY = "siteId";
 
-    static final String MEDIATOR_ID = "MoPubVAS-" + ADAPTER_VERSION;
+    public static final String MEDIATOR_ID = "MoPubVAS-" + ADAPTER_VERSION;
+    public static final String VAS_SITE_ID_KEY = "siteId";
 
     @NonNull
     @Override
@@ -52,8 +54,11 @@ public class VerizonAdapterConfiguration extends BaseAdapterConfiguration {
         final String editionVersion = Configuration.getString("com.verizon.ads",
                 "editionVersion", null);
 
-        if (!TextUtils.isEmpty(editionVersion)) {
-            return editionVersion;
+        final String editionName = Configuration.getString("com.verizon.ads",
+                "editionName", null);
+
+        if (!TextUtils.isEmpty(editionVersion) && !TextUtils.isEmpty(editionName)) {
+            return editionName + "-" + editionVersion;
         }
 
         final String adapterVersion = getAdapterVersion();

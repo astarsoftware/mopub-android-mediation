@@ -1,4 +1,22 @@
 ## Changelog
+ * 6.10.1.0
+    * This version of the adapters has been certified with ironSource 6.10.1.
+
+ * 6.10.0.0
+    * This version of the adapters has been certified with ironSource 6.10.0.
+
+ * 6.9.1.1
+    * Add support for AndroidX. This is the minimum version compatible with MoPub 5.9.0.
+
+ * 6.9.1.0
+    * This version of the adapters has been certified with ironSource 6.9.1.
+
+ * 6.9.0.0
+    * This version of the adapters has been certified with ironSource 6.9.0.
+
+ * 6.8.5.0
+    * This version of the adapters has been certified with ironSource 6.8.5.
+
  * 6.8.4.0
     * This version of the adapters has been certified with ironSource 6.8.4.
     * Revised adapter code to comply with ironSource 6.8.4.

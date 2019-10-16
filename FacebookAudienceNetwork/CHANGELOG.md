@@ -1,4 +1,41 @@
 ## Changelog
+ * 5.5.0.8
+    * Replace `AdIconView` with `MediaView` for the ad icon view as it has been deprecated by Facebook. 
+
+ * 5.5.0.7
+    * Fix error codes mapping for the banner and interstitial adapters. 
+
+ * 5.5.0.6
+    * Fix banner size checks so 250 doesn't always get treated as 90.
+
+ * 5.5.0.5
+    * Remove native video handling code and associated comments. Publishers can enable/disable video on the Facebook Audience Network dashboard.
+
+ * 5.5.0.4
+    * Add support for AndroidX. This is the minimum version compatible with MoPub 5.9.0.
+
+ * 5.5.0.3
+    * Throw a playback error (instead of load failure) when a rewarded video has expired.
+
+ * 5.5.0.2
+    * Check if the Facebook ad (interstitial / rewarded video) has been invalidated before showing.
+
+ * 5.5.0.1
+    * Support additional interstitial and rewarded video callbacks from the `InterstitialAdExtendedListener` interface.
+
+ * 5.5.0.0
+    * This version of the adapters has been certified with Facebook Audience Network 5.5.0.
+    * Bidder token generation doesn't depend on Facebook SDK initialization.
+
+ * 5.4.1.1
+    * Fix banner size passing as part of 5.8.0+ MoPub SDK release changes.
+
+ * 5.4.1.0
+    * This version of the adapters has been certified with Facebook Audience Network 5.4.1.
+
+ * 5.4.0.0
+    * This version of the adapters has been certified with Facebook Audience Network 5.4.0.
+
  * 5.3.1.0
     * This version of the adapters has been certified with Facebook Audience Network 5.3.1.
 

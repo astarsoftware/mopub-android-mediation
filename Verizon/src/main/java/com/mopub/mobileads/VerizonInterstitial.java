@@ -3,7 +3,7 @@ package com.mopub.mobileads;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.astarsoftware.dependencies.DependencyInjector;
@@ -240,11 +240,14 @@ public class VerizonInterstitial extends CustomEventInterstitial {
             verizonInterstitialAd = interstitialAd;
 
             MoPubLog.log(LOAD_SUCCESS, ADAPTER_NAME);
-            
+
             VerizonUtils.postOnUiThread(new Runnable() {
 
                 @Override
                 public void run() {
+                    final CreativeInfo creativeInfo = verizonInterstitialAd == null ? null : verizonInterstitialAd.getCreativeInfo();
+                    MoPubLog.log(CUSTOM, ADAPTER_NAME, "Verizon creative info: " + creativeInfo);
+
                     if (listener != null) {
 
 						final CreativeInfo creativeInfo = verizonInterstitialAd == null ? null : verizonInterstitialAd.getCreativeInfo();

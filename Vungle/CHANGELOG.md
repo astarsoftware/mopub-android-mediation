@@ -1,4 +1,27 @@
 ## Changelog
+  * 6.4.11.4
+    * Fire `onInterstitialShown` callback when interstitial records an impression.
+
+  * 6.4.11.3
+    * Prioritize reading data from `localExtras` and fall back to `MediationSettings` if necessary for `VungleRewardedVideo.java`
+      
+  * 6.4.11.2
+    * Add support for AndroidX. This is the minimum version compatible with MoPub 5.9.0.
+
+  * 6.4.11.1
+    * Added manual click tracking to `VungleBanner` based of Vungle's definition of a click.
+    * Add manual impression tracking for `VungleInterstitial`.
+
+  * 6.4.11.0
+    * This version of adapters has been certified with Vungle 6.4.11.
+    * Added support for banner ad.
+
+  * 6.3.24.4
+    * Allow supported mediated networks and publishers to opt-in to process a user’s personal data based on legitimate interest basis. More details [here](https://developers.mopub.com/docs/publisher/gdpr-guide/#legitimate-interest-support).
+
+  * 6.3.24.3
+    * Enable passing config option for Vungle auto rotate setting.
+
   * 6.3.24.2
     * Vungle Adapter will now be released as an Android Archive (AAR) file that includes manifest file for Vungle.
 
