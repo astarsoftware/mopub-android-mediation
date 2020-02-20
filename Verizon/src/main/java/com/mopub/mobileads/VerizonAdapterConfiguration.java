@@ -6,15 +6,11 @@ import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
 import com.mopub.common.BaseAdapterConfiguration;
 import com.mopub.common.OnNetworkInitializationFinishedListener;
 import com.mopub.common.Preconditions;
 import com.mopub.common.logging.MoPubLog;
 import com.mopub.mobileads.verizon.BuildConfig;
-import com.mopub.nativeads.NativeErrorCode;
 import com.verizon.ads.Configuration;
 import com.verizon.ads.ErrorInfo;
 import com.verizon.ads.Logger;
@@ -23,6 +19,9 @@ import com.verizon.ads.edition.StandardEdition;
 import com.verizon.ads.utils.ThreadUtils;
 
 import java.util.Map;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import static com.verizon.ads.VASAds.ERROR_AD_REQUEST_FAILED;
 import static com.verizon.ads.VASAds.ERROR_AD_REQUEST_TIMED_OUT;
@@ -141,22 +140,6 @@ public class VerizonAdapterConfiguration extends BaseAdapterConfiguration {
             case ERROR_AD_REQUEST_FAILED:
             default:
                 return MoPubErrorCode.NETWORK_INVALID_STATE;
-        }
-    }
-
-    public static NativeErrorCode convertErrorInfoToMoPubNative(final ErrorInfo errorInfo) {
-        if (errorInfo == null) {
-            return NativeErrorCode.UNSPECIFIED;
-        }
-
-        switch (errorInfo.getErrorCode()) {
-            case ERROR_NO_FILL:
-                return NativeErrorCode.NETWORK_NO_FILL;
-            case ERROR_AD_REQUEST_TIMED_OUT:
-                return NativeErrorCode.NETWORK_TIMEOUT;
-            case ERROR_AD_REQUEST_FAILED:
-            default:
-                return NativeErrorCode.NETWORK_INVALID_STATE;
         }
     }
 }
