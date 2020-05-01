@@ -19,6 +19,7 @@ import com.mopub.common.DataKeys;
 import com.mopub.common.LifecycleListener;
 import com.mopub.common.MediationSettings;
 import com.mopub.common.MoPubReward;
+import com.mopub.common.Preconditions;
 import com.mopub.common.logging.MoPubLog;
 import com.mopub.common.util.Json;
 
@@ -36,6 +37,7 @@ import static com.mopub.common.logging.MoPubLog.AdapterLogEvent.SHOULD_REWARD;
 import static com.mopub.common.logging.MoPubLog.AdapterLogEvent.SHOW_ATTEMPTED;
 import static com.mopub.common.logging.MoPubLog.AdapterLogEvent.SHOW_FAILED;
 import static com.mopub.common.logging.MoPubLog.AdapterLogEvent.SHOW_SUCCESS;
+import static com.mopub.mobileads.MoPubErrorCode.EXPIRED;
 
 public class AdColonyRewardedVideo extends CustomEventRewardedVideo {
 
@@ -94,9 +96,17 @@ public class AdColonyRewardedVideo extends CustomEventRewardedVideo {
         mScheduledThreadPoolExecutor.shutdownNow();
         AdColonyInterstitial ad = sZoneIdToAdMap.get(mZoneId);
         if (ad != null) {
+            cleanUp(ad);
+        }
+    }
+
+    private static void cleanUp(AdColonyInterstitial ad) {
+        if (ad != null) {
             ad.destroy();
-            sZoneIdToAdMap.remove(mZoneId);
-            MoPubLog.log(getAdNetworkId(), CUSTOM, ADAPTER_NAME, "AdColony rewarded video destroyed");
+            if (sZoneIdToAdMap != null) {
+                sZoneIdToAdMap.remove(mZoneId);
+            }
+            MoPubLog.log(mZoneId, CUSTOM, ADAPTER_NAME, "AdColony rewarded video destroyed");
         }
     }
 
@@ -319,6 +329,7 @@ public class AdColonyRewardedVideo extends CustomEventRewardedVideo {
     private static class AdColonyListener extends AdColonyInterstitialListener
             implements AdColonyRewardListener, CustomEventRewardedVideoListener {
         private AdColonyAdOptions mAdOptions;
+        private Boolean videoClosed = false;
 
         AdColonyListener(AdColonyAdOptions adOptions) {
             mAdOptions = adOptions;
@@ -338,15 +349,15 @@ public class AdColonyRewardedVideo extends CustomEventRewardedVideo {
                 reward = MoPubReward.success(a.getRewardName(), a.getRewardAmount());
 
                 MoPubLog.log(getAdNetworkId(), SHOULD_REWARD, ADAPTER_NAME, a.getRewardAmount(), a.getRewardName());
+
+                MoPubRewardedVideoManager.onRewardedVideoCompleted(
+                        AdColonyRewardedVideo.class,
+                        a.getZoneID(),
+                        reward);
             } else {
                 MoPubLog.log(getAdNetworkId(), CUSTOM, ADAPTER_NAME, "AdColonyReward failed");
-                reward = MoPubReward.failure();
+                closeAdColonyVideo(a.getZoneID());
             }
-
-            MoPubRewardedVideoManager.onRewardedVideoCompleted(
-                    AdColonyRewardedVideo.class,
-                    a.getZoneID(),
-                    reward);
         }
 
         @Override
@@ -366,10 +377,17 @@ public class AdColonyRewardedVideo extends CustomEventRewardedVideo {
 
         @Override
         public void onClosed(@NonNull AdColonyInterstitial ad) {
-            MoPubLog.log(getAdNetworkId(), CUSTOM, ADAPTER_NAME, "Adcolony rewarded ad has been dismissed");
+            if (!videoClosed) {
+                closeAdColonyVideo(ad.getZoneID());
+            }
+        }
+
+        private void closeAdColonyVideo(String zoneId) {
+            videoClosed = true;
+            MoPubLog.log(zoneId, CUSTOM, ADAPTER_NAME, "AdColony rewarded ad has been dismissed");
             MoPubRewardedVideoManager.onRewardedVideoClosed(
                     AdColonyRewardedVideo.class,
-                    ad.getZoneID());
+                    zoneId);
         }
 
         @Override
@@ -382,7 +400,17 @@ public class AdColonyRewardedVideo extends CustomEventRewardedVideo {
 
         @Override
         public void onExpiring(@NonNull AdColonyInterstitial ad) {
-            AdColony.requestInterstitial(ad.getZoneID(), ad.getListener(), mAdOptions);
+            Preconditions.checkNotNull(ad);
+
+            final String expiredZoneId = ad.getZoneID();
+            MoPubLog.log(expiredZoneId, CUSTOM, ADAPTER_NAME, "Expiring unused " +
+                    "AdColony Rewarded Video ad due to AdColony's 30-minute expiration policy.");
+            MoPubRewardedVideoManager.onRewardedVideoPlaybackError(AdColonyRewardedVideo.class,
+                    expiredZoneId, EXPIRED);
+            MoPubLog.log(expiredZoneId, LOAD_FAILED, ADAPTER_NAME,
+                    MoPubErrorCode.EXPIRED.getIntCode(), MoPubErrorCode.EXPIRED);
+
+            cleanUp(ad);
         }
 
         @Override

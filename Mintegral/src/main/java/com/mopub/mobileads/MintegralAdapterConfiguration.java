@@ -24,6 +24,9 @@ import com.mopub.mobileads.mintegral.BuildConfig;
 import java.lang.reflect.Method;
 import java.util.Map;
 
+import static com.mintegral.msdk.MIntegralConstans.AUTHORITY_ALL_INFO;
+import static com.mintegral.msdk.MIntegralConstans.IS_SWITCH_OFF;
+import static com.mintegral.msdk.MIntegralConstans.IS_SWITCH_ON;
 import static com.mopub.common.logging.MoPubLog.AdapterLogEvent.CUSTOM;
 import static com.mopub.common.logging.MoPubLog.AdapterLogEvent.CUSTOM_WITH_THROWABLE;
 
@@ -37,11 +40,14 @@ public class MintegralAdapterConfiguration extends BaseAdapterConfiguration {
     private static final String SDK_VERSION = MTGConfiguration.SDK_VERSION;
     private static final String MOPUB_NETWORK_NAME = BuildConfig.NETWORK_NAME;
 
+    private static boolean sdkInitialized = false;
+
     private static int mAge;
     private static String mCustomData;
     private static int mGender;
     private static Double mLatitude;
     private static Double mLongitude;
+    private static boolean mIsMute;
     private static int mPay;
     private static String mRewardId;
     private static String mUserId;
@@ -57,7 +63,7 @@ public class MintegralAdapterConfiguration extends BaseAdapterConfiguration {
     public String getBiddingToken(@NonNull Context context) {
         Preconditions.checkNotNull(context);
 
-        return BidManager.getBuyerUid(context);
+        return !sdkInitialized ? null : BidManager.getBuyerUid(context);
     }
 
     @NonNull
@@ -87,10 +93,10 @@ public class MintegralAdapterConfiguration extends BaseAdapterConfiguration {
                 if (!TextUtils.isEmpty(appId) && !TextUtils.isEmpty(appKey)) {
                     configureMintegral(appId, appKey, context);
 
-                    listener.onNetworkInitializationFinished(MintegralAdapterConfiguration.class,
+                    listener.onNetworkInitializationFinished(this.getClass(),
                             MoPubErrorCode.ADAPTER_INITIALIZATION_SUCCESS);
                 } else {
-                    listener.onNetworkInitializationFinished(MintegralAdapterConfiguration.class,
+                    listener.onNetworkInitializationFinished(this.getClass(),
                             MoPubErrorCode.ADAPTER_CONFIGURATION_ERROR);
                 }
             }
@@ -101,9 +107,16 @@ public class MintegralAdapterConfiguration extends BaseAdapterConfiguration {
     }
 
     public static void configureMintegral(String appId, String appKey, Context context) {
+
+        if (sdkInitialized) return;
+
         final MIntegralSDK sdk = MIntegralSDKFactory.getMIntegralSDK();
 
         if (sdk != null) {
+            final boolean canCollectPersonalInfo = MoPub.canCollectPersonalInformation();
+            final int switchState = canCollectPersonalInfo ? IS_SWITCH_ON : IS_SWITCH_OFF;
+            sdk.setUserPrivateInfoType(context, AUTHORITY_ALL_INFO, switchState);
+
             final Map<String, String> mtgConfigurationMap = sdk.getMTGConfigurationMap(appId, appKey);
 
             if (context instanceof Activity) {
@@ -111,6 +124,8 @@ public class MintegralAdapterConfiguration extends BaseAdapterConfiguration {
             } else if (context instanceof Application) {
                 sdk.init(mtgConfigurationMap, context);
             }
+
+            sdkInitialized = true;
 
         } else {
             MoPubLog.log(CUSTOM, "Failed to initialize the Mintegral SDK because the SDK " +
@@ -221,6 +236,14 @@ public class MintegralAdapterConfiguration extends BaseAdapterConfiguration {
 
     public static String getUserId() {
         return TextUtils.isEmpty(mUserId) ? "" : mUserId;
+    }
+
+    public static void setMute(boolean muteStatus) {
+        mIsMute = muteStatus;
+    }
+
+    public static boolean isMute() {
+        return mIsMute;
     }
 
     static void addChannel() {
