@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
 
+import com.astarsoftware.android.AndroidUtils;
 import com.google.ads.mediation.admob.AdMobAdapter;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.MobileAds;
@@ -90,6 +91,11 @@ public class GooglePlayServicesAdapterConfiguration extends BaseAdapterConfigura
         if (!MoPub.canCollectPersonalInformation()) {
             npaBundle.putString("npa", "1");
         }
+
+        //A-Star customization for setting restricted data processing for CCPA opt-out users
+        if(AndroidUtils.isCCPAOptOut()) {
+			npaBundle.putInt("rdp", 1);
+		}
 
         if (!npaBundle.isEmpty()) {
             builder.addNetworkExtrasBundle(AdMobAdapter.class, npaBundle);
