@@ -13,11 +13,13 @@ import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.RequestConfiguration;
+import com.google.android.gms.ads.ResponseInfo;
 import com.mopub.common.DataKeys;
 import com.mopub.common.logging.MoPubLog;
 import com.mopub.common.util.Views;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import static com.google.android.gms.ads.AdSize.BANNER;
@@ -236,8 +238,20 @@ public class GooglePlayServicesBanner extends CustomEventBanner {
                 mBannerListener.onBannerLoaded(mGoogleAdView);
             }
 
+			Map<String, String> networkInfo = new HashMap<>();
+            if(mGoogleAdView != null &&
+				mGoogleAdView.getResponseInfo() != null) {
+            	ResponseInfo responseInfo = mGoogleAdView.getResponseInfo();
+				if(responseInfo.getResponseId() != null) {
+					networkInfo.put("admobResponseIdentifier", responseInfo.getResponseId());
+				}
+				if(responseInfo.getMediationAdapterClassName() != null) {
+					networkInfo.put("adNetworkClassName", responseInfo.getMediationAdapterClassName());
+				}
+			}
+
 			AdNetworkTracker adTracker = DependencyInjector.getObjectWithClass(AdNetworkTracker.class);
-			adTracker.adDidLoadForNetwork("admob", null);
+			adTracker.adDidLoadForNetwork("admob", networkInfo);
         }
 
         @Override

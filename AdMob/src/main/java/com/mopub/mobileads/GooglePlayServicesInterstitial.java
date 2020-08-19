@@ -14,9 +14,11 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.RequestConfiguration;
+import com.google.android.gms.ads.ResponseInfo;
 import com.mopub.common.logging.MoPubLog;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import static com.google.android.gms.ads.RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_FALSE;
@@ -225,8 +227,20 @@ public class GooglePlayServicesInterstitial extends CustomEventInterstitial {
                 mInterstitialListener.onInterstitialLoaded();
             }
 
+			Map<String, String> networkInfo = new HashMap<>();
+			if(mGoogleInterstitialAd != null &&
+				mGoogleInterstitialAd.getResponseInfo() != null) {
+				ResponseInfo responseInfo = mGoogleInterstitialAd.getResponseInfo();
+				if(responseInfo.getResponseId() != null) {
+					networkInfo.put("admobResponseIdentifier", responseInfo.getResponseId());
+				}
+				if(responseInfo.getMediationAdapterClassName() != null) {
+					networkInfo.put("adNetworkClassName", responseInfo.getMediationAdapterClassName());
+				}
+			}
+
 			AdNetworkTracker adTracker = DependencyInjector.getObjectWithClass(AdNetworkTracker.class);
-			adTracker.adDidLoadForNetwork("admob", null);
+			adTracker.adDidLoadForNetwork("admob", networkInfo);
         }
 
         @Override
