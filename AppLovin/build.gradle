@@ -1,8 +1,10 @@
-project.version = '9.15.1.0'
+project.version = '10.1.2.0'
 project.ext.networkName = 'applovin_sdk'
 
 apply from: '../shared-build.gradle'
 
 dependencies {
     implementation "com.applovin:applovin-sdk:${sdkVersion}"
+	implementation project(':Libraries:Java:Android:libAndroid')
+	implementation project(':ThirdParty:Java:Android:MoPub:mopub-sdk:')
 }

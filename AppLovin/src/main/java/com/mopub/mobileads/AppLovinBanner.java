@@ -22,12 +22,15 @@ import com.applovin.sdk.AppLovinMediationProvider;
 import com.applovin.sdk.AppLovinPrivacySettings;
 import com.applovin.sdk.AppLovinSdk;
 import com.applovin.sdk.AppLovinSdkSettings;
+import com.astarsoftware.android.ads.AdNetworkTracker;
+import com.astarsoftware.dependencies.DependencyInjector;
 import com.mopub.common.DataKeys;
 import com.mopub.common.LifecycleListener;
 import com.mopub.common.MoPub;
 import com.mopub.common.Preconditions;
 import com.mopub.common.logging.MoPubLog;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static com.mopub.common.DataKeys.ADUNIT_FORMAT;
@@ -190,13 +193,22 @@ public class AppLovinBanner extends BaseAd {
                         public void run() {
                             MoPubLog.log(getAdNetworkId(), LOAD_SUCCESS, ADAPTER_NAME);
                             MoPubLog.log(getAdNetworkId(), SHOW_ATTEMPTED, ADAPTER_NAME);
-
                             mAdView.renderAd(ad);
                             MoPubLog.log(getAdNetworkId(), SHOW_SUCCESS, ADAPTER_NAME);
 
                             try {
                                 if (mLoadListener != null) {
                                     mLoadListener.onAdLoaded();
+									Map<String, String> networkInfo = new HashMap<>();
+									if(ad != null) {
+										networkInfo.put("appLovinAdUniqueId", Long.toString(ad.getAdIdNumber()));
+									}
+									if(ad.getZoneId() != null) {
+										networkInfo.put("appLovinZoneIdentifier", ad.getZoneId());
+									}
+
+									AdNetworkTracker adTracker = DependencyInjector.getObjectWithClass(AdNetworkTracker.class);
+									adTracker.adDidLoadForNetwork("applovin", networkInfo);
                                 }
                             } catch (Throwable th) {
                                 MoPubLog.log(getAdNetworkId(), CUSTOM_WITH_THROWABLE, "Unable to notify listener " +

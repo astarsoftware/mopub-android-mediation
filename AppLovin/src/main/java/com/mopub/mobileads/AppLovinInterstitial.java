@@ -21,6 +21,8 @@ import com.applovin.sdk.AppLovinMediationProvider;
 import com.applovin.sdk.AppLovinPrivacySettings;
 import com.applovin.sdk.AppLovinSdk;
 import com.applovin.sdk.AppLovinSdkSettings;
+import com.astarsoftware.android.ads.AdNetworkTracker;
+import com.astarsoftware.dependencies.DependencyInjector;
 import com.mopub.common.DataKeys;
 import com.mopub.common.LifecycleListener;
 import com.mopub.common.MoPub;
@@ -217,6 +219,16 @@ public class AppLovinInterstitial extends BaseAd implements AppLovinAdLoadListen
 
                     if (mLoadListener != null) {
                         mLoadListener.onAdLoaded();
+						Map<String, String> networkInfo = new HashMap<>();
+						if(ad != null) {
+							networkInfo.put("appLovinAdUniqueId", Long.toString(ad.getAdIdNumber()));
+						}
+						if(ad.getZoneId() != null) {
+							networkInfo.put("appLovinZoneIdentifier", ad.getZoneId());
+						}
+
+						AdNetworkTracker adTracker = DependencyInjector.getObjectWithClass(AdNetworkTracker.class);
+						adTracker.adDidLoadForNetwork("applovin", networkInfo);
                     }
                 } catch (Throwable th) {
                     MoPubLog.log(getAdNetworkId(), CUSTOM_WITH_THROWABLE, "Unable to notify listener of " +
